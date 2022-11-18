@@ -1,0 +1,36 @@
+{
+    "name": "rickey-journal",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "seed": "node models/seed.js",
+        "start": "node server.js",
+        "start-dev": "nodemon server.js"
+      },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/wandering-codesman/rickey-journal.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/wandering-codesman/rickey-journal/issues"
+    },
+    "homepage": "https://github.com/wandering-codesman/rickey-journal#readme",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "express-openid-connect": "^2.10.0",
+        "jsonwebtoken": "^8.5.1",
+        "morgan": "^1.10.0",
+        "nodemon": "^2.0.20",
+        "sequelize": "^6.25.5",
+        "sqlite3": "^5.1.2"
+    },
+    "devDependencies": {
+        "prettier": "2.7.1"
+    }
+}
