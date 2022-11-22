@@ -1,1 +1,11 @@
-GET http://localhost:3000/users
+GET http://localhost:3000/users 
+###
+
+POST http://localhost:3000/profile/journal
+content-type: application/json
+
+{
+    "title": "Something",
+    "date": 10102000,
+    "content": "Lorem Ipsum"
+}

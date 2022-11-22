@@ -7,6 +7,8 @@ const app = express();
 const { userRt, journalRt, checkRegisteredUser } = require('./routes');
 const { auth, requiresAuth } = require('express-openid-connect');
 const { Journal } = require('./models/Journal');
+const { User } = require('./models/User');
+const { resolveConfigFile } = require('prettier');
 const {
     PORT = 3000,
     AUTH0_SECRET,
@@ -35,7 +37,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // routes
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/html/home.html');
+    if (!requiresAuth()) {
+        res.sendFile(__dirname + '/html/home-user.html');
+    }
+    // res.sendFile(__dirname + '/html/home.html');
+    res.send('hello');
 });
 
 app.get('/profile', requiresAuth(), (req, res) => {
@@ -49,16 +55,28 @@ app.get('/profile/journal', requiresAuth(), async (req, res) => {
 });
 
 app.post('/profile/journal', requiresAuth(), async (req, res) => {
-    const [journal, newJournal] = await Journal.findOrCreate({
-        where: {
-            title:
-            date:
-            content:
-        }
-    });
-    res.sendFile(__dirname + '/html/journal.html');
-    res.json(journal);
+    try {
+        const journal = await Journal.create({
+            title: req.body.title,
+            date: req.body.date,
+            content: req.body.content
+        }).then((result) => res.redirect(result));
+    } catch (error) {
+        console.log(error);
+    }
 });
+
+// app.post('/profile/journal', requiresAuth(), async (req, res) => {
+//     const [journal, newJournal] = await Journal.findOrCreate({
+//         where: {
+//             title:
+//             date:
+//             content:
+//         }
+//     });
+//     res.sendFile(__dirname + '/html/journal.html');
+//     res.json(journal);
+// });
 
 // server
 app.listen(PORT, () => {
