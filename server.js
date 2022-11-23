@@ -35,25 +35,45 @@ app.use(auth(config));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+(user, context, callback) => {
+    context.redirect = {
+        url: 'http://localhost:3000/'
+    };
+    return callback(null, user, context);
+};
+
 // routes
-app.get('/', (req, res) => {
-    if (!requiresAuth()) {
-        res.sendFile(__dirname + '/html/home-user.html');
-    }
+// home
+app.get('/', async (req, res) => {
+    requiresAuth()
+        ? res.sendFile(__dirname + '/html/home-user.html')
+        : res.send('hello');
+    // if (requiresAuth()) {
+    //     res.sendFile(__dirname + '/html/home-user.html');
+    // }
+
     // res.sendFile(__dirname + '/html/home.html');
-    res.send('hello');
 });
 
-app.get('/profile', requiresAuth(), (req, res) => {
+// profile
+app.get('/profile', requiresAuth(), async (req, res) => {
+    const user = await User.findOne({
+        where: {
+            username: req.oidc.user.nickname
+        },
+        raw: true
+    });
     res.sendFile(__dirname + '/html/profile.html');
 });
 
+// journal
 app.get('/profile/journal', requiresAuth(), async (req, res) => {
     const journal = await Journal.findAll();
     res.sendFile(__dirname + '/html/journal.html');
     res.json(journal);
 });
 
+// add journal entry
 app.post('/profile/journal', requiresAuth(), async (req, res) => {
     try {
         const journal = await Journal.create({
@@ -66,6 +86,39 @@ app.post('/profile/journal', requiresAuth(), async (req, res) => {
     }
 });
 
+// edit journal entry
+app.put('/profile/journal/:id', requiresAuth(), async (req, res) => {
+    const journalUpdate = await Journal.findByPk(req.params.id);
+
+    if (!journalUpdate) {
+        res.sendStatus(404);
+        return;
+    }
+    try {
+        await journalUpdate.update(req.body);
+        res.sendStatus(200);
+    } catch (error) {
+        console.log(error);
+        res.status(400).send(error.errors);
+    }
+});
+
+// delete journal entry
+
+app.delete('/profile/journal/:id', requiresAuth(), async (req, res) => {
+    const deleted = await Journal.destroy({
+        where: {
+            id: req.params.id
+        }
+    });
+    if (!deleted) {
+        res.status(404).send(
+            `There is no journal with this id ${req.params.id}.`
+        );
+        return;
+    }
+    res.status(202).send(`Journal with id ${req.params.id} was deleted.`);
+});
 // app.post('/profile/journal', requiresAuth(), async (req, res) => {
 //     const [journal, newJournal] = await Journal.findOrCreate({
 //         where: {

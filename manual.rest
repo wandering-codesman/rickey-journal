@@ -9,3 +9,17 @@ content-type: application/json
     "date": 10102000,
     "content": "Lorem Ipsum"
 }
+
+###
+
+DELETE  http://localhost:3000/profile/journal/4
+
+###
+PUT http://localhost:3000/profile/journal/2
+content-type: application/json
+
+{
+    "title": "Something",
+    "date": 10102000,
+    "content": "Lorem Ipsum"
+}
